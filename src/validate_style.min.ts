@@ -2,6 +2,7 @@ import {validateConstants} from './validate/validate_constants';
 import {validate} from './validate/validate';
 import {latest} from './reference/latest';
 
+import {validateModel} from './validate/validate_model';
 import {validateSource} from './validate/validate_source';
 import {validateLight} from './validate/validate_light';
 import {validateSky} from './validate/validate_sky';
@@ -66,6 +67,7 @@ export function validateStyleMin(
     return sortErrors(errors);
 }
 
+validateStyleMin.model = wrapCleanErrors(injectValidateSpec(validateModel));
 validateStyleMin.source = wrapCleanErrors(injectValidateSpec(validateSource));
 validateStyleMin.sprite = wrapCleanErrors(injectValidateSpec(validateSprite));
 validateStyleMin.glyphs = wrapCleanErrors(injectValidateSpec(validateGlyphsUrl));

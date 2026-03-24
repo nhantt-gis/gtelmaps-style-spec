@@ -71,6 +71,8 @@ function propertyType(property, key?) {
             }
             case 'sources':
                 return '{[_: string]: SourceSpecification}';
+            case 'models':
+                return '{[_: string]: ModelSpecification}';
             case '*':
                 return 'unknown';
             default:
@@ -211,6 +213,7 @@ export type InterpolationSpecification =
 
 export type ExpressionSpecification =
     // types
+    | ['vector3', ExpressionInputType | ExpressionSpecification, ExpressionInputType | ExpressionSpecification, ExpressionInputType | ExpressionSpecification] // array
     | ['array', ExpressionSpecification] // array
     | ['array', 'string' | 'number' | 'boolean', ExpressionSpecification] // array
     | ['array', 'string' | 'number' | 'boolean', number, ExpressionSpecification] // array
@@ -405,6 +408,12 @@ ${objectDeclaration('SkySpecification', spec.sky)}
 ${objectDeclaration('ProjectionSpecification', spec.projection)}
 
 ${objectDeclaration('TerrainSpecification', spec.terrain)}
+
+${objectDeclaration('ModelSourceModelSpecification', spec.modelSourceModel)}
+
+export type ModelSourceModelsSpecification = {[_: string]: ModelSourceModelSpecification};
+
+export type ModelSpecification = ${propertyType(spec.model)}
 
 ${spec.source
     .map((key) => {
