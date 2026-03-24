@@ -3,6 +3,7 @@ import {Var} from './var';
 import {Literal} from './literal';
 import {Assertion} from './assertion';
 import {Coercion} from './coercion';
+import {MakeVector3} from './vector3';
 import {At} from './at';
 import {In} from './in';
 import {IndexOf} from './index_of';
@@ -33,6 +34,7 @@ import type {ExpressionRegistry} from '../expression';
 
 export const expressions: ExpressionRegistry = {
     // special forms
+    'vector3': MakeVector3,
     '==': Equals,
     '!=': NotEquals,
     '>': GreaterThan,

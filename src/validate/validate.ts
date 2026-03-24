@@ -3,6 +3,7 @@ import {unbundle, deepUnbundle} from '../util/unbundle_jsonlint';
 import {isExpression} from '../expression';
 import {isFunction} from '../function';
 
+import {validateModel} from './validate_model';
 import {validateFunction} from './validate_function';
 import {validateExpression} from './validate_expression';
 import {validateObject} from './validate_object';
@@ -36,6 +37,7 @@ const VALIDATORS = {
     '*'() {
         return [];
     },
+    model: validateModel,
     array: validateArray,
     boolean: validateBoolean,
     number: validateNumber,

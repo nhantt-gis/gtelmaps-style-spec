@@ -273,6 +273,15 @@
           }
         }
       ]
+    },
+    "models": {
+      "type": "models",
+      "doc": "Specification of models used in the style.",
+      "example": {
+        "spruce1-lod0": "asset://spruce1-lod0.glb",
+        "spruce1-lod1": "asset://spruce1-lod1.glb",
+        "spruce1-lod2": "asset://spruce1-lod2.glb"
+      }
     }
   },
   "sources": {
@@ -282,6 +291,7 @@
     }
   },
   "source": [
+    "source_model",
     "source_vector",
     "source_raster",
     "source_raster_dem",
@@ -759,6 +769,86 @@
       }
     }
   },
+  "modelSourceModel": {
+      "uri": {
+        "type": "string",
+        "required": true,
+        "doc": "A URL to a model resource. Supported protocols are `http:`, `https:`, and `mapbox://<Model ID>`."
+      },
+      "position": {
+        "type": "array",
+        "value": "number",
+        "length": 2,
+        "required": false,
+        "default": [0,0],
+        "minimum": [-180, -90],
+        "maximum": [180, 90],
+        "doc": "Position of the model in longitude and latitude [lng, lat]."
+      },
+      "orientation": {
+        "type": "array",
+        "value": "number",
+        "length": 3,
+        "required": false,
+        "default": [0,0,0],
+        "period": 360,
+        "units": "degrees",
+        "doc": "Orientation of the model in euler angles [x, y, z]."
+      },
+      "featureProperties": {
+        "type": "*",
+        "doc": "An object defining custom properties of the model. Properties are accessible as feature properties in expressions.",
+        "required": false
+      }
+  },
+  "modelSourceModels": {
+    "*": {
+       "type": "modelSourceModel",
+       "doc": "A 3D model and its properties."
+    }
+  },
+  "source_model" : {
+    "type": {
+      "required": true,
+        "type": "enum",
+        "values": {
+          "model": {
+            "doc": "A collection of 3D models"
+          }
+       },
+      "doc": "Type of model source to be added. From single models to represent 2D layers to 3D tiled models covering a wide area."
+    },
+    "maxzoom": {
+      "type": "number",
+      "default": 18,
+      "doc": "Maximum zoom level at which to create model tiles."
+    },
+    "minzoom": {
+      "type": "number",
+      "default": 0,
+      "doc": "Minimum zoom level for which model tiles are available"
+    },
+    "tiles": {
+      "type": "array",
+      "value": "string",
+      "doc": "An array of one or more tile source URLs, as in the TileJSON spec"
+    },
+    "models": {
+      "type": "modelSourceModels",
+      "doc": "Defines properties of 3D models in collection. Requires `model` source type."
+    }
+  },
+  "model": {
+    "type": "string",
+    "doc": "A URL to a model resource. Supported protocols are `http:`, `https:`, and `mapbox://<Model ID>`.",
+    "required": true
+  },
+  "models" : {
+    "*": {
+      "type": "model",
+      "doc": "A URL to a model resource. Supported protocols are `http:`, `https:`, and `mapbox://<Model ID>`."
+    }
+  },
   "layer": {
     "id": {
       "type": "string",
@@ -853,6 +943,16 @@
             }
           }
         },
+        "model": {
+          "doc": "A 3D model",
+          "sdk-support": {
+            "basic functionality": {
+              "js": "3.0.0",
+              "android": "11.0.0",
+              "ios": "11.0.0"
+            }
+          }
+        },
         "color-relief": {
           "doc": "Client-side elevation coloring based on DEM data. The implementation supports Mapbox Terrain RGB, Mapzen Terrarium tiles and custom encodings.",
           "sdk-support": {
@@ -918,6 +1018,7 @@
     }
   },
   "layout": [
+    "layout_model",
     "layout_fill",
     "layout_line",
     "layout_circle",
@@ -2853,6 +2954,68 @@
         ]
       },
       "property-type": "data-constant"
+    }
+  },
+  "layout_model": {
+    "visibility": {
+      "type": "enum",
+      "values": {
+        "visible": {
+          "doc": "The layer is shown."
+        },
+        "none": {
+          "doc": "The layer is not shown."
+        }
+      },
+      "default": "visible",
+      "doc": "Whether this layer is displayed.",
+      "sdk-support": {
+        "basic functionality": {
+          "js": "3.0.0",
+          "android": "11.0.0",
+          "ios": "11.0.0"
+        }
+      },
+      "expression": {
+        "interpolated": false,
+        "parameters": [
+          "global-state"
+        ]
+      },
+      "property-type": "data-constant"
+    },
+    "model-id": {
+      "type": "string",
+      "default": "",
+      "doc": "Model to render. It can be either a string referencing an element to the models root property or an internal or external URL",
+      "property-type": "data-driven",
+      "expression": {
+        "interpolated": false,
+        "parameters": [
+          "zoom",
+          "feature"
+        ]
+      },
+      "sdk-support": {
+        "basic functionality": {
+          "js": "3.0.0",
+          "android": "11.0.0",
+          "ios": "11.0.0"
+        },
+        "data-driven styling": {
+          "js": "3.0.0",
+          "android": "11.0.0",
+          "ios": "11.0.0"
+        }
+      },
+      "transition": false,
+      "requires": [
+        {
+          "source": [
+            "geojson",
+            "vector"
+          ]
+        }]
     }
   },
   "layout_color-relief": {
@@ -5977,6 +6140,7 @@
     }
   },
   "paint": [
+    "paint_model",
     "paint_fill",
     "paint_line",
     "paint_circle",
@@ -8062,6 +8226,138 @@
         ]
       },
       "property-type": "data-constant"
+    }
+  },
+  "paint_model" : {
+    "model-opacity": {
+      "type": "number",
+      "default": 1,
+      "minimum": 0,
+      "maximum": 1,
+      "doc": "The opacity of the model layer. Except for zoom, expressions that are data-driven are not supported if using GeoJSON or vector tile as the model layer source.",
+      "transition": false,
+      "expression": {
+        "interpolated": true,
+        "parameters": ["feature", "feature-state", "zoom"]
+      },
+      "sdk-support": {
+        "basic functionality": {
+          "js": "3.0.0",
+          "android": "11.0.0",
+          "ios": "11.0.0"
+        },
+        "data-driven styling": {
+          "js": "3.9.0",
+          "android": "11.9.0",
+          "ios": "11.9.0"
+        }
+      },
+      "property-type": "data-driven"
+    },
+    "model-rotation": {
+      "type": "array",
+      "value": "number",
+      "length": 3,
+      "default": [0, 0, 0],
+      "doc": "The rotation of the model in euler angles [lon, lat, z].",
+      "period": 360,
+      "units": "degrees",
+      "property-type": "data-driven",
+      "transition": false,
+      "expression": {
+        "interpolated": true,
+        "parameters": ["feature", "feature-state", "zoom"]
+      },
+      "sdk-support": {
+        "basic functionality": {
+          "js": "0.10.0",
+          "android": "2.0.1",
+          "ios": "2.0.0"
+        },
+        "data-driven styling": {
+          "js": "0.29.0",
+          "android": "5.0.0",
+          "ios": "3.5.0"
+        }
+      }
+    },
+    "model-scale": {
+      "type": "array",
+      "value": "number",
+      "length": 3,
+      "default": [1, 1, 1],
+      "doc": "The scale of the model. Expressions that are zoom-dependent are not supported if using GeoJSON or vector tile as the model layer source.",
+      "property-type": "data-driven",
+      "transition": false,
+      "expression": {
+        "interpolated": true,
+        "parameters": ["feature", "feature-state", "zoom"]
+      },
+      "sdk-support": {
+        "basic functionality": {
+          "js": "0.10.0",
+          "android": "2.0.1",
+          "ios": "2.0.0"
+        },
+        "data-driven styling": {
+          "js": "0.29.0",
+          "android": "5.0.0",
+          "ios": "3.5.0"
+        }
+      }
+    },
+    "model-translation": {
+      "type": "array",
+      "value": "number",
+      "length": 3,
+      "default": [0, 0, 0],
+      "property-type": "data-driven",
+      "transition": false,
+      "expression": {
+        "interpolated": true,
+        "parameters": ["feature", "feature-state", "zoom"]
+      },
+      "sdk-support": {
+        "basic functionality": {
+          "js": "0.10.0",
+          "android": "2.0.1",
+          "ios": "2.0.0"
+        },
+        "data-driven styling": {
+          "js": "0.29.0",
+          "android": "5.0.0",
+          "ios": "3.5.0"
+        }
+      },
+      "doc": "The translation of the model in meters in form of [longitudal, latitudal, altitude] offsets."
+    },
+    "model-elevation-reference": {
+      "type": "enum",
+      "doc": "Selects the base of the model. Some modes might require precomputed elevation data in the tileset.",
+      "values": {
+        "sea": {
+          "doc": "Elevated rendering is enabled. Use this mode to elevate models relative to the sea level."
+        },
+        "ground": {
+          "doc": "Elevated rendering is enabled. Use this mode to elevate models relative to the ground's height below them."
+        }
+      },
+      "default": "ground",
+      "transition": false,
+      "expression": {
+        "interpolated": false,
+        "parameters": [
+          "zoom"
+        ]
+      },
+      "property-type": "data-constant",
+      "sdk-support": {
+        "basic functionality": {
+          "js": "3.17.0",
+          "android": "11.10.0",
+          "ios": "11.10.0"
+        }
+      }
     }
   },
   "paint_color-relief": {

@@ -32,6 +32,7 @@ export function validateStyle(
     return validateStyleMin(s, styleSpec);
 }
 
+export const model = validateStyleMin.model;
 export const source = validateStyleMin.source;
 export const light = validateStyleMin.light;
 export const sky = validateStyleMin.sky;
